@@ -63,6 +63,15 @@ func NewScoreMax(max, weight int) *Score {
 	}
 }
 
+// IncBy increments score n times or until score equals MaxScore.
+func (s *Score) IncBy(n int) {
+	if s.Score+n < s.MaxScore {
+		s.Score += n
+	} else {
+		s.Score = s.MaxScore
+	}
+}
+
 // Inc increments score if score is less than MaxScore.
 func (s *Score) Inc() {
 	if s.Score < s.MaxScore {
@@ -74,6 +83,15 @@ func (s *Score) Inc() {
 func (s *Score) Dec() {
 	if s.Score > 0 {
 		s.Score--
+	}
+}
+
+// DecBy decrements score n times or until Score equals zero.
+func (s *Score) DecBy(n int) {
+	if s.Score-n > 0 {
+		s.Score -= n
+	} else {
+		s.Score = 0
 	}
 }
 
