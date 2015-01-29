@@ -12,7 +12,7 @@ import (
 // the Score struct constructors. Users of this package should set this
 // variable appropriately (for example in func init) before using any exported
 // function in this package.
-var GlobalSecret string = "NOT SET"
+var GlobalSecret = "NOT SET"
 
 // Score is a struct used to encode/decode a score from a test or tests. When a
 // test is passed or a calculation of partial passed test is found, output a
@@ -51,7 +51,7 @@ func NewScore(max, weight int) *Score {
 	}
 }
 
-// NewScore returns a new Score with the given arguments, Secret set to the
+// NewScoreMax returns a new Score with the given arguments, Secret set to the
 // value of GlobalSecret and MaxScore set to max.
 func NewScoreMax(max, weight int) *Score {
 	return &Score{
