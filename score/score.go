@@ -84,6 +84,7 @@ func (s *Score) DumpAsJSON(t *testing.T) {
 		t.Logf("error dumping score to json: %v\n", err)
 	}
 	//t.Logf("%s\n", b)
+	fmt.Println()
 	fmt.Printf("%s\n", b)
 }
 
