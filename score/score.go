@@ -108,8 +108,16 @@ func (s *Score) DumpAsJSON(t *testing.T) {
 
 // DumpScoreToStudent prints score s to testing context t as a string using the
 // format: "TestName: 2/10 cases passed".
+// TODO(anyone): Method is deprecated.
+// Remove this method when test cases have been updated.
 func (s *Score) DumpScoreToStudent(t *testing.T) {
 	t.Logf("%s: %d/%d cases passed", s.TestName, s.Score, s.MaxScore)
+}
+
+// Returns a string representation of score s.
+// format: "TestName: 2/10 cases passed".
+func (s *Score) String() string {
+	return fmt.Sprintf("%s: %d/%d cases passed", s.TestName, s.Score, s.MaxScore)
 }
 
 // testName returns the name of a test when used by the Score-constructors.
