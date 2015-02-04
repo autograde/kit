@@ -3,9 +3,9 @@ package score
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"runtime"
 	"strings"
-	"testing"
 )
 
 // GolbalSecret represents the unique course identifier that will be used in
@@ -95,29 +95,24 @@ func (s *Score) DecBy(n int) {
 	}
 }
 
-// DumpAsJSON encodes s as JSON and prints the result to testing context t.
-func (s *Score) DumpAsJSON(t *testing.T) {
-	b, err := json.Marshal(s)
-	if err != nil {
-		t.Logf("error dumping score to json: %v\n", err)
-	}
-	//t.Logf("%s\n", b)
-	fmt.Println()
-	fmt.Printf("%s\n", b)
-}
-
-// DumpScoreToStudent prints score s to testing context t as a string using the
-// format: "TestName: 2/10 cases passed".
-// TODO(anyone): Method is deprecated.
-// Remove this method when test cases have been updated.
-func (s *Score) DumpScoreToStudent(t *testing.T) {
-	t.Logf("%s: %d/%d cases passed", s.TestName, s.Score, s.MaxScore)
-}
-
-// Returns a string representation of score s.
-// format: "TestName: 2/10 cases passed".
+// String returns a string representation of score s.
+// Format: "TestName: 2/10 cases passed".
 func (s *Score) String() string {
 	return fmt.Sprintf("%s: %d/%d cases passed", s.TestName, s.Score, s.MaxScore)
+}
+
+// WriteString writes the string representation of s to w.
+func (s *Score) WriteString(w io.Writer) {
+	fmt.Fprintf(w, "%v\n", s)
+}
+
+// WriteJSON writes the JSON representation of s to w.
+func (s *Score) WriteJSON(w io.Writer) {
+	b, err := json.Marshal(s)
+	if err != nil {
+		fmt.Fprintf(w, "json.Marshal error: \n%v\n", err)
+	}
+	fmt.Fprintf(w, "\n%s\n", b)
 }
 
 // testName returns the name of a test when used by the Score-constructors.
