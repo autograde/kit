@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hfurubotten/ag-scoring/score"
+	"github.com/autograde/kit/score"
 )
 
 type SearchType int
