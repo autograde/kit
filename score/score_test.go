@@ -1,25 +1,66 @@
 package score
 
-import (
-	"encoding/json"
-	"testing"
-)
+import "testing"
 
-func TestScoreStrings(t *testing.T) {
-	scoreLine := `{"Secret":"92bc4fd5549d8e4f14ab4e96f7a0be02","TestName":"Assignment1","Score":0.8,"MaxScore":1.0,"Weight":1.0}`
-	var score Score
-	err := json.Unmarshal([]byte(scoreLine), &score)
-	if err != nil && err.Error() != "json: cannot unmarshal number 0.8 into Go value of type int" {
-		t.Error("Unmarshal returned unexpected string:", err)
+var theSecret = "my secret code"
+
+func init() {
+	GlobalSecret = theSecret
+}
+
+var nonJSONLog = []string{
+	"heere is some output",
+	"some other output",
+	"line contains " + theSecret,
+	theSecret + " should not be revealed",
+}
+
+func TestParseNonJSONStrings(t *testing.T) {
+	for _, s := range nonJSONLog {
+		sc, err := Parse(s, GlobalSecret)
+		if err == nil {
+			t.Errorf("Expected '%v', got '<nil>'", ErrScoreNotFound.Error())
+		}
+		if sc != nil {
+			t.Errorf("Got unexpected score object '%v', wanted '<nil>'", sc)
+		}
 	}
-	scoreLine = `{"Secret":"92bc4fd5549d8e4f14ab4e96f7a0be02","TestName":"Assignment1","Score":8,"MaxScore":1.0,"Weight":1.0}`
-	err = json.Unmarshal([]byte(scoreLine), &score)
-	if err != nil && err.Error() != "json: cannot unmarshal number 1.0 into Go value of type int" {
-		t.Error("Unmarshal returned unexpected string:", err)
-	}
-	scoreLine = `{"Secret":"92bc4fd5549d8e4f14ab4e96f7a0be02","TestName":"Assignment1","Score":8,"MaxScore":10,"Weight":100}`
-	err = json.Unmarshal([]byte(scoreLine), &score)
-	if err != nil {
-		t.Error("Unmarshal returned unexpected string:", err)
+}
+
+var jsonLog = []struct {
+	in  string
+	out *Score
+	err error
+}{
+	{`{"Secret":"` + theSecret + `","TestName":"init","Score":0,"MaxScore":10,"Weight":10}`,
+		NewScore(10, 10),
+		nil,
+	},
+	{`{"Secret":"the wrong secret","TestName":"init","Score":0,"MaxScore":10,"Weight":10}`,
+		nil,
+		ErrScoreNotFound,
+	},
+}
+
+// Equal returns true if sc equals other. Ignores the Secret field.
+func (sc *Score) Equal(other *Score) bool {
+	return other != nil &&
+		sc.TestName == other.TestName &&
+		sc.Score == other.Score &&
+		sc.MaxScore == other.MaxScore &&
+		sc.Weight == other.Weight
+}
+
+func TestParseJSONStrings(t *testing.T) {
+	for _, s := range jsonLog {
+		sc, err := Parse(s.in, GlobalSecret)
+		if sc != s.out || err != s.err {
+			if !s.out.Equal(sc) || err != s.err {
+				t.Errorf("Failed to parse:\n%v\nGot: '%v', '%v'\nExp: '%v', '%v'", s.in, sc, err, s.out, s.err)
+			}
+			if sc != nil && sc.Secret == GlobalSecret {
+				t.Errorf("Parse function failed to hide global secret: %v", sc.Secret)
+			}
+		}
 	}
 }
