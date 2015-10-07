@@ -33,3 +33,8 @@ func Parse(s, secret string) (*Score, error) {
 	}
 	return nil, ErrScoreNotFound
 }
+
+// HasPrefix returns true if the provided string s has a parsable prefix string.
+func HasPrefix(s string) bool {
+	return strings.HasPrefix(s, `{"Secret":`)
+}
