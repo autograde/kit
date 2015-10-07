@@ -10,6 +10,8 @@ var scores = []struct {
 	{[]*Score{setScore(5, 10, 1), setScore(5, 5, 1), setScore(20, 40, 1)}, 66},
 	{[]*Score{setScore(5, 10, 1), setScore(5, 10, 1), setScore(20, 40, 1)}, 50},
 	{[]*Score{setScore(10, 10, 2), setScore(5, 10, 1), setScore(20, 40, 1)}, 75},
+	{[]*Score{setScore(0, 10, 2), setScore(0, 10, 1), setScore(0, 40, 1)}, 0},
+	{[]*Score{}, 0},
 }
 
 func setScore(points, max, w int) *Score {
