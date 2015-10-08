@@ -36,5 +36,17 @@ func Parse(s, secret string) (*Score, error) {
 
 // HasPrefix returns true if the provided string s has a parsable prefix string.
 func HasPrefix(s string) bool {
-	return strings.HasPrefix(s, `{"Secret":`)
+	prefixes := []string{
+		`{"Secret":`,
+		`{"TestName":`,
+		`{"Score":`,
+		`{"MaxScore":`,
+		`{"Weight":`,
+	}
+	for _, prefix := range prefixes {
+		if strings.HasPrefix(s, prefix) {
+			return true
+		}
+	}
+	return false
 }
