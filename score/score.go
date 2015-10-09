@@ -9,39 +9,50 @@ import (
 )
 
 // GolbalSecret represents the unique course identifier that will be used in
-// the Score struct constructors. Users of this package should set this
-// variable appropriately (for example in func init) before using any exported
-// function in this package.
+// the Score constructors. Users of this package must set this variable
+// appropriately (for example in func init) before using any exported
+// function in this package. The value of the global secret is available from
+// the teachers panel after a course has been created.
 var GlobalSecret = "NOT SET"
 
-// Score is a struct used to encode/decode a score from a test or tests. When a
-// test is passed or a calculation of partial passed test is found, output a
-// JSON object representing this struct.
+// Score encodes the score of a test or a group of tests. When a test passes in
+// Autograder, a JSON object representing this struct is emitted to the output
+// stream.
 //
-// Secret read from the output steam need to correspond to the course identifier
-// given on the teachers panel. All other output will be ignored.
+// The JSON object emitted on the output stream contains a Secret hash value
+// which is a unique course identifier that can be obtained from the teachers
+// panel in Autograder. This Secret is used by Autograder to extract Score
+// objects from the output stream. All other output is ignored when computing
+// the score.
 //
-// With the formula in the Autograder CI the score percentage is calculated
-// automatically. Give any max score, then pass on a given score the student
-// gets for passed sub test within this the max score. Finally, set a weight
-// it should have on the total. The weight does not need to within 100 or a
-// percentage. If you want to only give a score for completing a test, then
-// MaxScore == Score.
+// The Autograder computes the score accoring to the formula below, providing
+// a percentage score for a test or a group of tests. The Weight parameter can
+// be used to give more/less value to some Score objects (representing
+// different test sets). For example, a Weight of 2 on test A and a Weight of 1
+// on all other tests will give twice the score for test A compare to the
+// other tests.
 //
-// Calculations in the CI follows this formula:
-// total_weight    = sum(Weight)
-// task_score[0:n] = Score[i] / MaxScore[i], gives {0 < task_score < 1}
-// student_score   = sum( task_score[i] * (Weight[i]/total_weight) ), gives {0 < student_score < 1}
+// If you want to only give a score for completing a test, then you can simply
+// use NewScoreMax(1, 1), without using any API methods to decrement the score,
+// giving a result of Score = MaxScore = 1 (and Weight = 1).
+//
+// The Autograder computes the final score as follows:
+// TotalWeight     = sum(Weight)
+// TaskScore[i]    = Score[i] / MaxScore[i], gives {0 < TaskScore < 1}
+// TaskWeight[i]   = Weight[i] / TotalWeight
+// Score           = sum(TaskScore[i]*TaskWeight[i]), gives {0 < Score < 1}
 type Score struct {
-	Secret   string // the unique identifier for your course
-	TestName string // Name of the tests that is covered
-	Score    int    // The score the student has accomplished
-	MaxScore int    // Max score possible to get on this specific test(s)
-	Weight   int    // The weight of this test(s)
+	Secret   string // the unique identifier for the course
+	TestName string // name of the test
+	Score    int    // the score obtained
+	MaxScore int    // max score possible to get on this specific test
+	Weight   int    // the weight of this test; used to compute final grade
 }
 
-// NewScore returns a new Score with the given arguments and Secret set to the
-// value of GlobalSecret.
+// NewScore returns a new Score object with the given max and weight.
+// The Score.Score field is 0 initially, and so Score.Inc() and IncBy() can
+// be called on the returned Score object.
+// Note that the TestName is initialized to the name of the calling method.
 func NewScore(max, weight int) *Score {
 	return &Score{
 		Secret:   GlobalSecret,
@@ -51,8 +62,10 @@ func NewScore(max, weight int) *Score {
 	}
 }
 
-// NewScoreMax returns a new Score with the given arguments, Secret set to the
-// value of GlobalSecret and MaxScore set to max.
+// NewScoreMax returns a new Score object with the given max and weight.
+// The Score.Score field is max initially, and so Score.Dec() and DecBy() can
+// be called on the returned Score object.
+// Note that the TestName is initialized to the name of the calling method.
 func NewScoreMax(max, weight int) *Score {
 	return &Score{
 		Secret:   GlobalSecret,
