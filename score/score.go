@@ -119,7 +119,7 @@ func (s *Score) WriteString(w io.Writer) {
 	// check if calling func paniced before calling this
 	if r := recover(); r != nil {
 		// reset score for paniced functions
-		sc.Score = 0
+		s.Score = 0
 	}
 	fmt.Fprintf(w, "%v\n", s)
 }
@@ -129,7 +129,7 @@ func (s *Score) WriteJSON(w io.Writer) {
 	// check if calling func paniced before calling this
 	if r := recover(); r != nil {
 		// reset score for paniced functions
-		sc.Score = 0
+		s.Score = 0
 	}
 	b, err := json.Marshal(s)
 	if err != nil {
