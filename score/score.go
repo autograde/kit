@@ -116,11 +116,21 @@ func (s *Score) String() string {
 
 // WriteString writes the string representation of s to w.
 func (s *Score) WriteString(w io.Writer) {
+	// check if calling func paniced before calling this
+	if r := recover(); r != nil {
+		// reset score for paniced functions
+		s.Score = 0
+	}
 	fmt.Fprintf(w, "%v\n", s)
 }
 
 // WriteJSON writes the JSON representation of s to w.
 func (s *Score) WriteJSON(w io.Writer) {
+	// check if calling func paniced before calling this
+	if r := recover(); r != nil {
+		// reset score for paniced functions
+		s.Score = 0
+	}
 	b, err := json.Marshal(s)
 	if err != nil {
 		fmt.Fprintf(w, "json.Marshal error: \n%v\n", err)
