@@ -2,7 +2,7 @@ package score
 
 // Total returns the total score computed over the set of scores provided.
 // The total is a grade in the range 0-100.
-func Total(scores []*Score) int {
+func Total(scores []*Score) uint8 {
 	totalWeight := float32(0)
 	var max, score, weight []float32
 	for _, ts := range scores {
@@ -20,5 +20,5 @@ func Total(scores []*Score) int {
 		total += ((score[i] / max[i]) * (weight[i] / totalWeight))
 	}
 
-	return int(total * 100)
+	return uint8(total * 100)
 }
