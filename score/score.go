@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// GolbalSecret represents the unique course identifier that will be used in
+// GlobalSecret represents the unique course identifier that will be used in
 // the Score constructors. Users of this package must set this variable
 // appropriately (for example in func init) before using any exported
 // function in this package. The value of the global secret is available from
@@ -144,13 +144,13 @@ func (s *Score) WriteJSON(w io.Writer) {
 // Score-constructors. It is not safe for other usage due to the hard-coded
 // skip constant used when calling runtime.Callers.
 func testName() string {
-	const skip = 3
-	pc := make([]uintptr, skip)
-	runtime.Callers(skip, pc)
-	f := runtime.FuncForPC(pc[0])
-	s := strings.Split(f.Name(), ".")
-	if s == nil {
-		return "Unknown test"
+	const skip = 2
+	pc, _, _, _ := runtime.Caller(skip)
+	funcName := runtime.FuncForPC(pc).Name()
+	lastSlash := strings.LastIndexByte(funcName, '/')
+	if lastSlash < 0 {
+		lastSlash = 0
 	}
-	return s[len(s)-1]
+	firstDot := strings.IndexByte(funcName[lastSlash:], '.') + lastSlash
+	return funcName[firstDot+1:]
 }
