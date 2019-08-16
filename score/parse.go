@@ -43,8 +43,9 @@ func HasPrefix(s string) bool {
 		`{"MaxScore":`,
 		`{"Weight":`,
 	}
+	trimmed := strings.TrimSpace(s)
 	for _, prefix := range prefixes {
-		if strings.HasPrefix(s, prefix) {
+		if strings.HasPrefix(trimmed, prefix) {
 			return true
 		}
 	}
